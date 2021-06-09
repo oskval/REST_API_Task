@@ -18,6 +18,11 @@ namespace API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureLogging(log => 
+                {
+                    log.ClearProviders();
+                    log.AddConsole();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
