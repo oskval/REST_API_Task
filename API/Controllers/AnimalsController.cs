@@ -29,5 +29,13 @@ namespace API.Controllers
             var animal = _context.Animals.Find(id);
             return animal;
         }
+
+        [HttpPost]
+        public ActionResult<Animal> AddAnimal(Animal animal)
+        {
+            var newAnimal = _context.Animals.Add(animal);
+            _context.SaveChanges();
+            return animal;
+        }
     }
 }
