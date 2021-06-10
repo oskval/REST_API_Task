@@ -37,5 +37,22 @@ namespace API.Controllers
             _context.SaveChanges();
             return animal;
         }
+
+        [HttpDelete]
+        public ActionResult DeleteAllAnimals()
+        {
+            _context.Animals.RemoveRange(_context.Animals);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult DeleteAnimal(int id)
+        {
+            var animal = _context.Animals.Find(id);
+            _context.Animals.Remove(animal);
+            _context.SaveChanges();
+            return Ok();
+        }
     }
 }
