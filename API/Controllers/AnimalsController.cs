@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -17,41 +19,41 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Animal>> GetAnimals()
+        public async Task<ActionResult<IEnumerable<Animal>>> GetAnimals()
         {
-            var animals = _context.Animals.ToList();
-            return animals;
+            var animals = await _context.Animals.ToListAsync();
+            return Ok(animals);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Animal> GetAnimal(int id)
+        public async Task<ActionResult<Animal>> GetAnimal(int id)
         {
-            var animal = _context.Animals.Find(id);
-            return animal;
+            var animal = await _context.Animals.FindAsync(id);
+            return Ok(animal);
         }
 
         [HttpPost]
-        public ActionResult<Animal> AddAnimal(Animal animal)
+        public async Task<ActionResult<Animal>> AddAnimal(Animal animal)
         {
-            var newAnimal = _context.Animals.Add(animal);
-            _context.SaveChanges();
+            var newAnimal = await _context.Animals.AddAsync(animal);
+            await _context.SaveChangesAsync();
             return animal;
         }
 
         [HttpDelete]
-        public ActionResult DeleteAllAnimals()
+        public async Task<ActionResult> DeleteAllAnimals()
         {
             _context.Animals.RemoveRange(_context.Animals);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteAnimal(int id)
+        public async Task<ActionResult> DeleteAnimal(int id)
         {
-            var animal = _context.Animals.Find(id);
+            var animal = await _context.Animals.FindAsync(id);
             _context.Animals.Remove(animal);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }
