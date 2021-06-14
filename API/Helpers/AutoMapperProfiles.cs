@@ -9,6 +9,7 @@ namespace API.Helpers
         public AutoMapperProfiles()
         {
             CreateMap<AnimalDto, Animal>();
+            CreateMap<Animal, AnimalDto>();
         }
     }
 }
