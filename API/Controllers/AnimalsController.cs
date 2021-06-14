@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
@@ -8,6 +9,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace API.Controllers
 {
@@ -15,6 +17,8 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class AnimalsController : ControllerBase
     {
+        List<AnimalDto> InitialAnimals = new List<AnimalDto>();
+        HttpClientHandler _clientHandler = new HttpClientHandler();
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         public AnimalsController(DataContext context, IMapper mapper)
@@ -91,8 +95,26 @@ namespace API.Controllers
         [HttpPost("AddInitialData/{count}")]
         public async Task<ActionResult<IEnumerable<Animal>>> AddInitialData(int count)
         {
-            
-            return Ok();
+            InitialAnimals = new List<AnimalDto>();
+             using (var httpClient = new HttpClient(_clientHandler))
+            {
+                using(var response=await httpClient.GetAsync("https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amount=" + count))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    InitialAnimals = JsonConvert.DeserializeObject<List<AnimalDto>>(apiResponse);
+                }
+            }
+            var newAnimal = new Animal();
+
+            foreach(var animalDto in InitialAnimals)
+            {
+                newAnimal = _mapper.Map<Animal>(animalDto);
+                await _context.Animals.AddAsync(newAnimal);
+
+            }
+            await _context.SaveChangesAsync();
+
+            return Ok(InitialAnimals);
         }
 
     }
